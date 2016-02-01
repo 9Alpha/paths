@@ -157,6 +157,7 @@ var to;
 var from;
 var startL;
 var openList;
+var useJump = false;
 
 function setup() {
 	var myCanvas = createCanvas(1000, 1000);
@@ -226,6 +227,12 @@ function keyTyped () {
 		theGrid[num] = true;
 		fill(255);
 		rect((num % (width/20)) * 20, (int)(num / (width/20)) * 20, 20, 20);
+	} else if (key === 'j') {
+		if (useJump) {
+			useJump = false;
+		} else {
+			useJump = true;
+		}
 	}
 }
 
@@ -234,6 +241,8 @@ function keyTyped () {
 function draw() {
 	//background(255);
 	//text(mouseX+", "+mouseY, mouseX, mouseY-5);
+
+	console.log(useJump);
 	
 	if (makePath) {
 		from = position;
@@ -273,6 +282,8 @@ function draw() {
 		var nextID = -1;
 		var quit = false;
 		//var parent;
+
+
 
 		openList.contains(function(node) {
 			if (node.data.id === startL) {
@@ -319,7 +330,7 @@ function draw() {
 			}
 		});
 
-		if (true === false) {
+		if (quit === false && useJump) {
 
 			temp = jump(lowestID, to, dirNext, parentMove+move[dirNext], openList, ID);
 			console.log(temp);
