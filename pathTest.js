@@ -242,7 +242,7 @@ function draw() {
 	//background(255);
 	//text(mouseX+", "+mouseY, mouseX, mouseY-5);
 
-	console.log(useJump);
+	//console.log(useJump);
 	
 	if (makePath) {
 		from = position;
@@ -325,7 +325,8 @@ function draw() {
 				else {
 					node.data.check = 'true';
 					node.data.type = 0;
-					//truths[node.data.id] = true;
+					fill(0, 255, 0);
+					rect((lowestID % (width/20)) * 20, (int)(lowestID / (width/20)) * 20, 20, 20);
 				}
 			}
 		});
@@ -337,13 +338,13 @@ function draw() {
 
 
 			if (temp !== null) {
+				openList.add(HValueArr[temp.id], temp.cost, temp.id, temp.dir, 'true', 1, lowestID, openList.traverseDF);
 				if (temp.id === to) {
 					console.log("path finished");
 					lowestID = temp.id;
 					pathDone = true;
 				}
 				else {
-					openList.add(HValueArr[temp.id], temp.cost, temp.id, temp.dir, 'true', 1, lowestID, openList.traverseDF);
 					lowestID = temp.id;
 					fill(255, 255, 0);
 					rect((temp.id % (width/20)) * 20, (int)(temp.id / (width/20)) * 20, 20, 20);
@@ -469,8 +470,8 @@ jump = function (start, target, dir, parentMove, open, ID) {
 
 	//console.log(ID+"   in jump");
 	if (theGrid[start] === false) {
-		fill(255, 0, 0);
-		rect((start % (width/20)) * 20, (int)(start / (width/20)) * 20, 20, 20);
+		//fill(255, 0, 0);
+		//rect((start % (width/20)) * 20, (int)(start / (width/20)) * 20, 20, 20);
 		return null;
 	}
 
@@ -479,7 +480,7 @@ jump = function (start, target, dir, parentMove, open, ID) {
 	}
 
 	else if (dir === 1 || dir === 3 || dir === 5 || dir === 7) {
-		if (dir === 1) {
+		if (dir === 1) {//up-right
 			if (!theGrid[spots[6]]) {
 				if (theGrid[spots[0]]) {
 					if (checkIfTrue(spots[0], open))
@@ -492,7 +493,7 @@ jump = function (start, target, dir, parentMove, open, ID) {
 						return {"id": spots[2], "dir": dir, "cost": parentMove};
 				}
 			}
-		} else if (dir === 3) {
+		} else if (dir === 3) {//down-right
 			if (!theGrid[spots[0]]) {
 				if (theGrid[spots[2]]) {
 					if (checkIfTrue(spots[2], open))
@@ -505,7 +506,7 @@ jump = function (start, target, dir, parentMove, open, ID) {
 						return {"id": spots[4], "dir": dir, "cost": parentMove};
 				}
 			}
-		} else if (dir === 5) {
+		} else if (dir === 5) {//down-left
 			if (!theGrid[spots[2]]) {
 				if (theGrid[spots[4]]) {
 					if (checkIfTrue(spots[4], open))
@@ -518,7 +519,7 @@ jump = function (start, target, dir, parentMove, open, ID) {
 						return {"id": spots[6], "dir": dir, "cost": parentMove};
 				}
 			}
-		} else if (dir === 7) {
+		} else if (dir === 7) {//up-left
 			if (!theGrid[spots[4]]) {
 				if (theGrid[spots[6]]) {
 					if (checkIfTrue(spots[6], open))
@@ -535,30 +536,30 @@ jump = function (start, target, dir, parentMove, open, ID) {
 
 		if (dir === 1) {
 			if (jump(spots[2], target, 2, parentMove+move[2], open, ID) !== null) { 
-				return {"id": spots[dir], "dir": 2, "cost": parentMove};
+				return {"id": start, "dir": 2, "cost": parentMove};
 			}  if (jump(spots[0], target, 0, parentMove+move[0], open, ID) !== null) {
-				return {"id": spots[dir], "dir": 0, "cost": parentMove};
+				return {"id": start, "dir": 0, "cost": parentMove};
 			}
 		}
 		else if (dir === 3) {
 			if (jump(spots[2], target, 2, parentMove+move[2], open, ID) !== null) { 
-				return {"id": spots[dir], "dir": 2, "cost": parentMove};
+				return {"id": start, "dir": 2, "cost": parentMove};
 			}  if (jump(spots[4], target, 4, parentMove+move[4], open, ID) !== null) {
-				return {"id": spots[dir], "dir": 4, "cost": parentMove};
+				return {"id": start, "dir": 4, "cost": parentMove};
 			}
 		}
 		else if (dir === 5) {
 			if (jump(spots[6], target, 6, parentMove+move[6], open, ID) !== null) { 
-				return {"id": spots[dir], "dir": 6, "cost": parentMove};
+				return {"id": start, "dir": 6, "cost": parentMove};
 			}  if (jump(spots[4], target, 4, parentMove+move[4], open, ID) !== null) {
-				return {"id": spots[dir], "dir": 4, "cost": parentMove};
+				return {"id": start, "dir": 4, "cost": parentMove};
 			}
 		}
 		else if (dir === 7) {
 			if (jump(spots[6], target, 6, parentMove+move[6], open, ID) !== null) { 
-				return {"id": spots[dir], "dir": 6, "cost": parentMove};
+				return {"id": start, "dir": 6, "cost": parentMove};
 			}  if (jump(spots[0], target, 0, parentMove+move[0], open, ID) !== null) {
-				return {"id": spots[dir], "dir": 0, "cost": parentMove};
+				return {"id": start, "dir": 0, "cost": parentMove};
 			}
 		}
 	} else {
