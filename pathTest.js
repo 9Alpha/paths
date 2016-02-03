@@ -21,8 +21,8 @@ function randomInt(min, max) {
 function calcHValue(toSpot, ID) {
 	var temp = 0;
 	for (var i = 0; i < theGrid.length; i++) {
-		temp+=Math.abs(((toSpot%50)-(i%50)));
-		temp+=Math.abs(parseInt(toSpot/50)-parseInt(i/50));
+		temp+=Math.abs(((toSpot%gridWidth)-(i%gridWidth)));
+		temp+=Math.abs(parseInt(toSpot/gridWidth)-parseInt(i/gridWidth));
 
 		HValueArr.push(temp);
 		temp = 0;
@@ -158,22 +158,24 @@ var from;
 var startL;
 var openList;
 var useJump = false;
+var worldSize = 3000;
+var gridWidth = worldSize/20;
 
 function setup() {
-	var myCanvas = createCanvas(1000, 1000);
+	var myCanvas = createCanvas(worldSize, worldSize);
 
-	for (var i = 0; i < 2500; i++) {
+	for (var i = 0; i < (gridWidth*gridWidth); i++) {
 		theGrid.push(true);
 		truths.push(false);
 	}
 
 	updateGrid(ID);
-	for (var i = 0; i < 2500; i++) {
-		if (i % 50 === 0 || i % 50 === 49 || i < 50 || i > 2449) {
+	for (var i = 0; i < (gridWidth*gridWidth); i++) {
+		if (i % gridWidth === 0 || i % gridWidth === gridWidth-1 || i < gridWidth || i > (gridWidth*gridWidth)-1) {
 			theGrid[i] = false;
 		} if (theGrid[i] === false) {
 			fill(0);
-			rect((i % (width/20)) * 20, (int)(i / (width/20)) * 20, 20, 20);
+			rect((i % gridWidth) * 20, (int)(i / gridWidth) * 20, 20, 20);
 		}
 	}
 	
@@ -186,27 +188,27 @@ function setup() {
 
 
 function mouseDragged() {
-	var num = ((int)(mouseY/20)*(width/20))+(int)(mouseX/20);
+	var num = ((int)(mouseY/20)*gridWidth)+(int)(mouseX/20);
 	theGrid[num] = false;
 	fill(0);
-	rect((num % (width/20)) * 20, (int)(num / (width/20)) * 20, 20, 20);
+	rect((num % gridWidth) * 20, (int)(num / gridWidth) * 20, 20, 20);
 }
 
 function keyTyped () {
 	console.log("key pressed");
 	if (key === 't') {
 		console.log("ttttt");
-		to = ((int)(mouseY/20)*(width/20))+(int)(mouseX/20);
+		to = ((int)(mouseY/20)*gridWidth)+(int)(mouseX/20);
 		fill(255, 0, 255);
-		rect((to % (width/20)) * 20, (int)(to / (width/20)) * 20, 20, 20);
+		rect((to % gridWidth) * 20, (int)(to / gridWidth) * 20, 20, 20);
 		console.log(to);
 	}
 
 	else if (key === 's') {
 		console.log("ssss");
-		position = ((int)(mouseY/20)*(width/20))+(int)(mouseX/20);
+		position = ((int)(mouseY/20)*gridWidth)+(int)(mouseX/20);
 		fill(255, 0, 0);
-		rect((position % (width/20)) * 20, (int)(position / (width/20)) * 20, 20, 20);
+		rect((position % gridWidth) * 20, (int)(position / gridWidth) * 20, 20, 20);
 		console.log(position);
 	}
 
@@ -214,19 +216,19 @@ function keyTyped () {
 		console.log("pppp");
 		background(255);
 		for (var i = 0; i < 2500; i++) {
-			if (i % 50 === 0 || i % 50 === 49 || i < 50 || i > 2449) {
+			if (i % gridWidth === 0 || i % gridWidth === gridWidth-1 || i < gridWidth || i > (gridWidth*gridWidth)-1) {
 				theGrid[i] = false;
 			} if (theGrid[i] === false) {
 				fill(0);
-				rect((i % (width/20)) * 20, (int)(i / (width/20)) * 20, 20, 20);
+				rect((i % gridWidth) * 20, (int)(i / gridWidth) * 20, 20, 20);
 			}
 		}
 		makePath = true;
 	} else if (key === 'c') {
-		var num = ((int)(mouseY/20)*(width/20))+(int)(mouseX/20);
+		var num = ((int)(mouseY/20)*gridWidth)+(int)(mouseX/20);
 		theGrid[num] = true;
 		fill(255);
-		rect((num % (width/20)) * 20, (int)(num / (width/20)) * 20, 20, 20);
+		rect((num % gridWidth) * 20, (int)(num / gridWidth) * 20, 20, 20);
 	} else if (key === 'j') {
 		if (useJump) {
 			useJump = false;
@@ -258,12 +260,12 @@ function draw() {
 		HValueArr = [];
 		calcHValue(to, 0);
 		for (var i = 0; i < HValueArr.length; i++) {
-			text(HValueArr[i], (i % (width/20)) * 20 + 10, (int)(i / (width/20)) * 20 + 15);
+			text(HValueArr[i], (i % gridWidth) * 20 + 10, (int)(i / gridWidth) * 20 + 15);
 		}
 		fill(255, 0, 0);
-		rect((position % (width/20)) * 20 + 5, (int)(position / (width/20)) * 20 + 5, 10, 10);
+		rect((position % gridWidth) * 20 + 5, (int)(position / gridWidth) * 20 + 5, 10, 10);
 		fill(255, 0, 255);
-		rect((to % (width/20)) * 20, (int)(to / (width/20)) * 20, 20, 20);
+		rect((to % gridWidth) * 20, (int)(to / gridWidth) * 20, 20, 20);
 		openList = new AStarTree(HValueArr[from], 0, from, 8, 'true', 0);
 		makePath = false;
 		pathing = true;
@@ -273,7 +275,7 @@ function draw() {
 	if (pathing && count % 1 === 0) {
 		//console.log(startL+"   "+to);
 		var move = [10, 14, 10, 14, 10, 14, 10, 14];
-		var spots = [startL-50, startL-50+1, startL+1, startL+50+1, startL+50, startL+50-1, startL-1, startL-50-1];
+		var spots = [startL-gridWidth, startL-gridWidth+1, startL+1, startL+gridWidth+1, startL+gridWidth, startL+gridWidth-1, startL-1, startL-gridWidth-1];
 		var parentMove = 0;
 		var temp  = null;
 		var dirNext;
@@ -297,7 +299,7 @@ function draw() {
 		for (var i = 0; i < cs.length; i++) {
 			if (cs[i]) {
 				fill(0, 0, 255);
-				rect((spots[i] % (width/20)) * 20 + 5, (int)(spots[i] / (width/20)) * 20 + 5, 10, 10);
+				rect((spots[i] % gridWidth) * 20 + 5, (int)(spots[i] / gridWidth) * 20 + 5, 10, 10);
 			}
 		}
 
@@ -326,7 +328,7 @@ function draw() {
 					node.data.check = 'true';
 					node.data.type = 0;
 					fill(0, 255, 0);
-					rect((lowestID % (width/20)) * 20, (int)(lowestID / (width/20)) * 20, 20, 20);
+					rect((lowestID % gridWidth) * 20, (int)(lowestID / gridWidth) * 20, 20, 20);
 				}
 			}
 		});
@@ -347,7 +349,7 @@ function draw() {
 				else {
 					lowestID = temp.id;
 					fill(255, 255, 0);
-					rect((temp.id % (width/20)) * 20, (int)(temp.id / (width/20)) * 20, 20, 20);
+					rect((temp.id % gridWidth) * 20, (int)(temp.id / gridWidth) * 20, 20, 20);
 				}
 			}
 		}
@@ -377,7 +379,7 @@ if (pathDone === false) {
 		}
 	}, openList.traverseDF);
 
-	rect((startL % (width/20)) * 20, (int)(startL / (width/20)) * 20, 20, 20);
+	rect((startL % gridWidth) * 20, (int)(startL / gridWidth) * 20, 20, 20);
 
 	
 
@@ -395,7 +397,7 @@ if (pathDone) {
 
 	fill(0);
 	for (var i = 0; i < pathArr.length; i++) {
-		ellipse((pathArr[i] % (width/20)) * 20 + 5, (int)(pathArr[i] / (width/20)) * 20 + 5, 10, 10);
+		ellipse((pathArr[i] % gridWidth) * 20 + 5, (int)(pathArr[i] / gridWidth) * 20 + 5, 10, 10);
 	}
 }
 
@@ -466,7 +468,7 @@ checkIfTrue = function(spot, list) {
 jump = function (start, target, dir, parentMove, open, ID) {
 	
 	var move = [10, 14, 10, 14, 10, 14, 10, 14];
-	var spots = [start-50, start-50+1, start+1, start+50+1, start+50, start+50-1, start-1, start-50-1];
+	var spots = [start-gridWidth, start-gridWidth+1, start+1, start+gridWidth+1, start+gridWidth, start+gridWidth-1, start-1, start-gridWidth-1];
 
 	//console.log(ID+"   in jump");
 	if (theGrid[start] === false) {
@@ -619,7 +621,7 @@ jump = function (start, target, dir, parentMove, open, ID) {
     }
 
     fill(120, 50);
-    rect((start % (width/20)) * 20, (int)(start / (width/20)) * 20, 20, 20);
+    rect((start % gridWidth) * 20, (int)(start / gridWidth) * 20, 20, 20);
 
     return jump(spots[dir], target, dir, parentMove+move[dir], open, ID);
 }
@@ -629,7 +631,7 @@ lookAround = function (start, parentMove, open, closed, ID) {
 	var cs = [false, false, false, false, false, false, false, false];
 	var move = [10, 14, 10, 14, 10, 14, 10, 14];
 	var opens = [false, false, false, false, false, false, false, false];
-	var spots = [start-50, start-50+1, start+1, start+50+1, start+50, start+50-1, start-1, start-50-1];
+	var spots = [start-gridWidth, start-gridWidth+1, start+1, start+gridWidth+1, start+gridWidth, start+gridWidth-1, start-1, start-gridWidth-1];
 	var parent;
 
 
