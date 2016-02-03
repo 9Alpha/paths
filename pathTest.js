@@ -171,7 +171,7 @@ function setup() {
 
 	updateGrid(ID);
 	for (var i = 0; i < (gridWidth*gridWidth); i++) {
-		if (i % gridWidth === 0 || i % gridWidth === gridWidth-1 || i < gridWidth || i > (gridWidth*gridWidth)-1) {
+		if (i % gridWidth === 0 || i % gridWidth === gridWidth-1 || i < gridWidth || i > (gridWidth*gridWidth)-1-gridWidth) {
 			theGrid[i] = false;
 		} if (theGrid[i] === false) {
 			fill(0);
@@ -215,8 +215,8 @@ function keyTyped () {
 	else if (key === 'p') {
 		console.log("pppp");
 		background(255);
-		for (var i = 0; i < 2500; i++) {
-			if (i % gridWidth === 0 || i % gridWidth === gridWidth-1 || i < gridWidth || i > (gridWidth*gridWidth)-1) {
+		for (var i = 0; i < (gridWidth*gridWidth); i++) {
+			if (i % gridWidth === 0 || i % gridWidth === gridWidth-1 || i < gridWidth || i > (gridWidth*gridWidth)-1-gridWidth) {
 				theGrid[i] = false;
 			} if (theGrid[i] === false) {
 				fill(0);
@@ -443,7 +443,7 @@ traceParents = function (list, start) {
 				
 			}
 		});
-		if (end > 10000) {
+		if (end > 10000000) {
 			next = false;
 		}
 	}
