@@ -31,116 +31,7 @@ function calcHValue(toSpot, ID) {
 
 
 
-function findIndex(arr, data) {
-	var index;
 
-	for (var i = 0; i < arr.length; i++) {
-		if (arr[i].data.id === data) {
-			index = i;
-		}
-	}
-
-	return index;
-}
-
-function Node(A, B, id, dir, check, type) {
-	var C = (int)(B+10*A);
-	this.data = {"id": id, "H": A, "G": B, "F": C, "dir": dir, "check": check, "type": type};
-	this.parent = null;
-	this.children = [];
-}
-
-function AStarTree(A, B, id, dir, check, type) {
-	var node = new Node(A, B, id, dir, check, type);
-	this._root = node;
-}
-
-AStarTree.prototype.traverseDF = function(callback) {
-
-    // this is a recurse and immediately-invoking function 
-    (function recurse(currentNode) {
-        // step 2
-        for (var i = 0, length = currentNode.children.length; i < length; i++) {
-            // step 3
-            recurse(currentNode.children[i]);
-        }
-
-        // step 4
-        callback(currentNode);
-
-        // step 1
-    })(this._root);
-
-};
-
-AStarTree.prototype.traverseBF = function(callback) {
-	var queue = [];
-
-	queue.enqueue(this._root);
-
-	currentTree = queue.dequeue();
-
-	while(currentTree){
-		for (var i = 0, length = currentTree.children.length; i < length; i++) {
-			queue.enqueue(currentTree.children[i]);
-		}
-
-		callback(currentTree);
-		currentTree = queue.dequeue();
-	}
-};
-
-AStarTree.prototype.contains = function(callback, traversal) {
-	traversal.call(this, callback);
-};
-
-AStarTree.prototype.add = function(A, B, id, dir, check, type, toData, traversal) {
-	var child = new Node(A, B, id, dir, check, type),
-	parent = null,
-	callback = function(node) {
-		if (node.data.id === toData) {
-			parent = node;
-		}
-	};
-
-	this.contains(callback, traversal);
-
-	if (parent) {
-		parent.children.push(child);
-		child.parent = parent;
-	} else {
-		console.log('Cannot add node to a non-existent parent.  Parent--> '+toData);
-	}
-};
-
-AStarTree.prototype.remove = function(id, fromData, traversal) {
-	var tree = this,
-	parent = null,
-	childToRemove = null,
-	index;
-
-	var callback = function(node) {
-		if (node.data.id === fromData) {
-			parent = node;
-		}
-	};
-
-	this.contains(callback, traversal);
-
-	if (parent) {
-		index = findIndex(parent.children, id);
-
-		if (index === undefined) {
-			console.log('Node to remove does not exist.');
-		} else {
-			childToRemove = parent.children.splice(index, 1);
-		}
-	} else {
-		console.log('Parent does not exist.');
-	}
-
-	return childToRemove;
-};
 
 
 var count = 0;
@@ -169,7 +60,7 @@ function setup() {
 		truths.push(false);
 	}
 
-	updateGrid(ID);
+	updateGrid();
 	for (var i = 0; i < (gridWidth*gridWidth); i++) {
 		if (i % gridWidth === 0 || i % gridWidth === gridWidth-1 || i < gridWidth || i > (gridWidth*gridWidth)-1-gridWidth) {
 			theGrid[i] = false;
@@ -195,25 +86,25 @@ function mouseDragged() {
 }
 
 function keyTyped () {
-	console.log("key pressed");
+	//console.log("key pressed");
 	if (key === 't') {
-		console.log("ttttt");
+		//console.log("ttttt");
 		to = ((int)(mouseY/20)*gridWidth)+(int)(mouseX/20);
 		fill(255, 0, 255);
 		rect((to % gridWidth) * 20, (int)(to / gridWidth) * 20, 20, 20);
-		console.log(to);
+		//console.log(to);
 	}
 
 	else if (key === 's') {
-		console.log("ssss");
+		//console.log("ssss");
 		position = ((int)(mouseY/20)*gridWidth)+(int)(mouseX/20);
 		fill(255, 0, 0);
 		rect((position % gridWidth) * 20, (int)(position / gridWidth) * 20, 20, 20);
-		console.log(position);
+		//console.log(position);
 	}
 
 	else if (key === 'p') {
-		console.log("pppp");
+		//console.log("pppp");
 		background(255);
 		for (var i = 0; i < (gridWidth*gridWidth); i++) {
 			if (i % gridWidth === 0 || i % gridWidth === gridWidth-1 || i < gridWidth || i > (gridWidth*gridWidth)-1-gridWidth) {
@@ -266,7 +157,8 @@ function draw() {
 		rect((position % gridWidth) * 20 + 5, (int)(position / gridWidth) * 20 + 5, 10, 10);
 		fill(255, 0, 255);
 		rect((to % gridWidth) * 20, (int)(to / gridWidth) * 20, 20, 20);
-		openList = new AStarTree(HValueArr[from], 0, from, 8, 'true', 0);
+		openList = new Tree(HValueArr[from], 0, from, 8, 'true', 0);
+		jumpList = new Tree(HValueArr[from], 0, from, 8, 'true', 0);
 		makePath = false;
 		pathing = true;
 	}
@@ -297,13 +189,12 @@ function draw() {
 		var cs = lookAround(startL, parentMove, openList, closed, ID);
 
 		for (var i = 0; i < cs.length; i++) {
-			if (cs[i]) {
+			if (cs[i] !== false) {
 				fill(0, 0, 255);
 				rect((spots[i] % gridWidth) * 20 + 5, (int)(spots[i] / gridWidth) * 20 + 5, 10, 10);
 			}
 		}
 
-		
 		openList.traverseDF(function(node) {
 			if (node.data.F < lowest && node.data.check === 'false') {
 				//console.log("id: "+node.data.id+" check: "+node.data.check+"  F: "+node.data.F);
@@ -336,7 +227,7 @@ function draw() {
 		if (quit === false && useJump) {
 
 			temp = jump(lowestID, to, dirNext, parentMove+move[dirNext], openList, ID);
-			console.log(temp);
+			//console.log(temp);
 
 
 			if (temp !== null) {
@@ -620,8 +511,8 @@ jump = function (start, target, dir, parentMove, open, ID) {
     	}
     }
 
-    fill(120, 50);
-    rect((start % gridWidth) * 20, (int)(start / gridWidth) * 20, 20, 20);
+    //fill(120, 50);
+    //rect((start % gridWidth) * 20, (int)(start / gridWidth) * 20, 20, 20);
 
     return jump(spots[dir], target, dir, parentMove+move[dir], open, ID);
 }
@@ -721,6 +612,9 @@ for (var i = 0; i < 8; i++) {
 			cs[i] = false;
 		}
 		else {
+			//if (useJump)
+			//	cs[i] = 10*HValueArr[spots[i]] + move[i]+parentMove;
+			//else
 			open.add(HValueArr[spots[i]], move[i]+parentMove, spots[i], i, 'false', 0, start, open.traverseDF);
 		}
 	}
@@ -729,7 +623,7 @@ for (var i = 0; i < 8; i++) {
 return cs;
 }
 
-updateGrid = function (ID) {
+updateGrid = function () {
 	theGrid[position] = false;
 }
 
