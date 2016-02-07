@@ -14,7 +14,7 @@ var pathing = false;
 var to = 100;
 var startL;
 var useJump = false;
-var worldSize = 500;
+var worldSize = 800;
 var gridWidth = worldSize/20;
 
 var move = [10, 14, 10, 14, 10, 14, 10, 14];
