@@ -1,14 +1,14 @@
 
 
-function Node(A, B, id, dir, check, type) {
+function Node(A, B, id, dir, check) {
 	var C = (int)(B+10*A);
-	this.data = {"id": id, "H": A, "G": B, "F": C, "dir": dir, "check": check, "type": type};
+	this.data = {"id": id, "H": A, "G": B, "F": C, "dir": dir, "check": check};
 	this.parent = null;
 	this.children = [];
 }
 
-function Tree(A, B, id, dir, check, type) {
-	var node = new Node(A, B, id, dir, check, type);
+function Tree(A, B, id, dir, check) {
+	var node = new Node(A, B, id, dir, check);
 	this._root = node;
 }
 
@@ -43,29 +43,12 @@ Tree.prototype.traverseDF = function(callback) {
 
 };
 
-Tree.prototype.traverseBF = function(callback) {
-	var queue = [];
-
-	queue.enqueue(this._root);
-
-	currentTree = queue.dequeue();
-
-	while(currentTree){
-		for (var i = 0, length = currentTree.children.length; i < length; i++) {
-			queue.enqueue(currentTree.children[i]);
-		}
-
-		callback(currentTree);
-		currentTree = queue.dequeue();
-	}
-};
-
 Tree.prototype.contains = function(callback, traversal) {
 	traversal.call(this, callback);
 };
 
-Tree.prototype.add = function(A, B, id, dir, check, type, toData, traversal) {
-	var child = new Node(A, B, id, dir, check, type),
+Tree.prototype.add = function(A, B, id, dir, check, toData, traversal) {
+	var child = new Node(A, B, id, dir, check),
 	parent = null,
 	callback = function(node) {
 		if (node.data.id === toData) {
@@ -101,12 +84,12 @@ Tree.prototype.remove = function(id, fromData, traversal) {
 		index = findIndex(parent.children, id);
 
 		if (index === undefined) {
-			console.log('Node to remove does not exist.');
+			console.log('Node to remove does not exist. ID--> '+id);
 		} else {
 			childToRemove = parent.children.splice(index, 1);
 		}
 	} else {
-		console.log('Parent does not exist.');
+		console.log('Parent does not exist. Parent--> '+fromData);
 	}
 
 	return childToRemove;
