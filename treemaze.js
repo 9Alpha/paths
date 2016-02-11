@@ -1,13 +1,13 @@
 
 
-function Node(x, y) {
+function NodeMaze(x, y) {
 	this.data = {"x": x, "y": y};
 	this.parent = null;
 	this.children = [];
 }
 
 function TreeMaze(x, y) {
-	var node = new Node(x, y);
+	var node = new NodeMaze(x, y);
 	this._root = node;
 }
 
@@ -47,7 +47,7 @@ TreeMaze.prototype.contains = function(traversal, callback) {
 };
 
 TreeMaze.prototype.add = function(x, y, px, py, traversal) {
-	var child = new Node(x, y),
+	var child = new NodeMaze(x, y),
 	parent = null,
 	callback = function(node) {
 		if (node.data.x === px && node.data.y === py) {
