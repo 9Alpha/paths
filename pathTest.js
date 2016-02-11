@@ -1,4 +1,4 @@
-
+var drawHere = document.getElementById('drawHere');
 var timeA, timeB, timeDif;
 var HValueArr = [];
 var lastNode = 0;
@@ -21,6 +21,7 @@ var move = [10, 14, 10, 14, 10, 14, 10, 14];
 
 function setup() {
 	var myCanvas = createCanvas(worldSize, worldSize+100);
+	myCanvas.parent('drawHere');
 
 	for (var i = 0; i < (gridWidth*gridWidth); i++) {
 		theGrid.push(true);
