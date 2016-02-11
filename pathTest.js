@@ -1,4 +1,4 @@
-
+var drawHere = document.getElementById('drawHere');
 var timeA, timeB, timeDif;
 var HValueArr = [];
 var lastNode = 0;
@@ -14,13 +14,14 @@ var pathing = false;
 var to = 100;
 var startL;
 var useJump = false;
-var worldSize = 500;
+var worldSize = 800;
 var gridWidth = worldSize/20;
 
 var move = [10, 14, 10, 14, 10, 14, 10, 14];
 
 function setup() {
 	var myCanvas = createCanvas(worldSize, worldSize+100);
+	myCanvas.parent('drawHere');
 
 	for (var i = 0; i < (gridWidth*gridWidth); i++) {
 		theGrid.push(true);
@@ -78,16 +79,40 @@ function keyTyped () {
 			}
 		}
 		makePath = true;
-	} else if (key === 'c') {
+	} 
+
+	else if (key === 'c') {
 		var num = ((int)(mouseY/20)*gridWidth)+(int)(mouseX/20);
 		theGrid[num] = true;
 		fill(255);
 		rect((num % gridWidth) * 20, (int)(num / gridWidth) * 20, 20, 20);
-	} else if (key === 'j') {
+	} 
+
+	else if (key === 'j') {
 		if (useJump) {
 			useJump = false;
 		} else {
 			useJump = true;
+		}
+	}
+
+	else if (key === 'm') {
+		background(255);
+		var mazeTree = new TreeMaze(1, 1);
+		mazeTree = makeMaze(1, 1, gridWidth, gridWidth, mazeTree);
+		for (var i = 0; i < (gridWidth*gridWidth); i++) {
+			theGrid[i] = false;
+		}
+		mazeTree.traverseDF(function (node) {
+			var num = node.data.y*gridWidth + node.data.x;
+			theGrid[num] = true;
+		});
+		theGrid = updateGrid(gridWidth, theGrid);
+		for (var i = 0; i < (gridWidth*gridWidth); i++) {
+			if (theGrid[i] === false) {
+				fill(0);
+				rect((i % gridWidth) * 20, (int)(i / gridWidth) * 20, 20, 20);
+			}
 		}
 	}
 }
@@ -105,7 +130,7 @@ function draw() {
 		calcHValue(to, 0);
 		strokeWeight(.1);
 		for (var i = 0; i < HValueArr.length; i++) {
-			text(i, (i % gridWidth) * 20 + 10, (int)(i / gridWidth) * 20 + 15);
+			text(HValueArr[i], (i % gridWidth) * 20 + 10, (int)(i / gridWidth) * 20 + 15);
 		}
 		strokeWeight(1);
 		
