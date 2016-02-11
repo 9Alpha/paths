@@ -1,6 +1,3 @@
-
-
-
 starPath = function (start, target, openS, wid, grid) {
 	var spots = [start-wid, start-wid+1, start+1, start+wid+1, start+wid, start+wid-1, start-1, start-wid-1];
 	var parentMove = 0;
