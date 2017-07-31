@@ -1,7 +1,7 @@
 
 
 function NodeMaze(x, y) {
-	this.data = {"x": x, "y": y};
+	this.data = {"x": x, "y": y, "u": true, "d": true, "l": true, "r": true};
 	this.parent = null;
 	this.children = [];
 }
@@ -22,6 +22,22 @@ function findIndex(arr, x, y) {
 	}
 
 	return index;
+}
+
+TreeMaze.prototype.setUp = function(tf) {
+	this.u = tf;
+}
+
+TreeMaze.prototype.setDown = function(tf) {
+	this.d = tf;
+}
+
+TreeMaze.prototype.setLeft = function(tf) {
+	this.l = tf;
+}
+
+TreeMaze.prototype.setRight = function(tf) {
+	this.r = tf;
 }
 
 TreeMaze.prototype.traverseDF = function(callback) {
