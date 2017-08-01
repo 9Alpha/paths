@@ -1,13 +1,11 @@
-
-
-function NodeMaze(x, y) {
-	this.data = {"x": x, "y": y, "u": true, "d": true, "l": true, "r": true};
+function NodeMaze(x, y, u, r, d, l, ut, rt, dt, lt) {
+	this.data = {"x": x, "y": y, "u": u, "r": r, "d": d, "l": l, "ut": ut, "rt": rt, "dt": dt, "lt": lt, "vPrev": false};
 	this.parent = null;
 	this.children = [];
 }
 
-function TreeMaze(x, y) {
-	var node = new NodeMaze(x, y);
+function TreeMaze(x, y, u, r, d, l, ut, rt, dt, lt) {
+	var node = new NodeMaze(x, y, u, r, d, l, ut, rt, dt, lt);
 	this._root = node;
 }
 
@@ -24,54 +22,26 @@ function findIndex(arr, x, y) {
 	return index;
 }
 
-TreeMaze.prototype.setUp = function(tf) {
-	this.u = tf;
-}
-
-TreeMaze.prototype.setDown = function(tf) {
-	this.d = tf;
-}
-
-TreeMaze.prototype.setLeft = function(tf) {
-	this.l = tf;
-}
-
-TreeMaze.prototype.setRight = function(tf) {
-	this.r = tf;
+function traverse(currentNode, callback) {
+	for (var i = 0; i < currentNode.children.length; i++) {
+		traverse(currentNode.children[i], callback);
+	}
+	callback(currentNode);
 }
 
 TreeMaze.prototype.traverseDF = function(callback) {
-
-    // this is a recurse and immediately-invoking function 
-    (function recurse(currentNode) {
-        // step 2
-        for (var i = 0, length = currentNode.children.length; i < length; i++) {
-            // step 3
-            recurse(currentNode.children[i]);
-        }
-
-        // step 4
-        callback(currentNode);
-
-        // step 1
-    })(this._root);
-
+	traverse(this._root, callback);
 };
 
-TreeMaze.prototype.contains = function(traversal, callback) {
-	traversal.call(this, callback);
-};
+TreeMaze.prototype.add = function(x, y, wallList, px, py) {
+	var child = new NodeMaze(x, y, wallList[0], wallList[1], wallList[2], wallList[3], wallList[4], wallList[5], wallList[6], wallList[7]);
+	var parent = null;
 
-TreeMaze.prototype.add = function(x, y, px, py, traversal) {
-	var child = new NodeMaze(x, y),
-	parent = null,
-	callback = function(node) {
+	traverse(this._root, function (node) {
 		if (node.data.x === px && node.data.y === py) {
 			parent = node;
 		}
-	};
-
-	this.contains(traversal, callback);
+	});
 
 	if (parent) {
 		parent.children.push(child);

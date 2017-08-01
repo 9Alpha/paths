@@ -50,7 +50,7 @@ lookAroundS = function (start, parentMove, openS, wid, grid) {
 	var parent;
 
 	for (var i = 0; i < 8; i++) {
-		if (grid[spots[i]] === false || spots[i] < 0 || spots[i] >= 2500) {
+		if (grid[spots[i]] === false || spots[i] < 0 || spots[i] >= (wid*wid)) {
 			cs[i] = false;
 		}
 	}
