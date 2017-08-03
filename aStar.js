@@ -1,4 +1,4 @@
-starPath = function (start, target, openS, wid, grid) {
+starPath = function (start, target, openS, wid, hig, grid) {
 	var spots = [start-wid, start-wid+1, start+1, start+wid+1, start+wid, start+wid-1, start-1, start-wid-1];
 	var parentMove = 0;
 	var temp  = null;
@@ -14,7 +14,7 @@ starPath = function (start, target, openS, wid, grid) {
 		} 
 	}, openS.traverseDF);
 
-	lookAroundS(start, parentMove, openS, wid, grid);
+	lookAroundS(start, parentMove, openS, wid, hig, grid);
 
 	openS.traverseDF(function(node) {
 		if (node.data.F < lowest && node.data.check === 'false') {
@@ -43,7 +43,7 @@ starPath = function (start, target, openS, wid, grid) {
 }
 
 
-lookAroundS = function (start, parentMove, openS, wid, grid) {
+lookAroundS = function (start, parentMove, openS, wid, hig, grid) {
 	var cs = [true, true, true, true, true, true, true, true];
 	var inOpen = [false, false, false, false, false, false, false, false];
 	var spots = [start-wid, start-wid+1, start+1, start+wid+1, start+wid, start+wid-1, start-1, start-wid-1];

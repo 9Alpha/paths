@@ -1,57 +1,49 @@
-function NodeMaze(x, y, u, r, d, l, ut, rt, dt, lt) {
-	this.data = {"x": x, "y": y, "u": u, "r": r, "d": d, "l": l, "ut": ut, "rt": rt, "dt": dt, "lt": lt, "vPrev": false};
+function NodeMaze(x, y, wallList, p) {
+	this.data = {"x": x, "y": y, "pDir": p};
+	this.walls = wallList;
+	this.data.pDir = p;
 	this.parent = null;
 	this.children = [];
 }
 
-function TreeMaze(x, y, u, r, d, l, ut, rt, dt, lt) {
-	var node = new NodeMaze(x, y, u, r, d, l, ut, rt, dt, lt);
-	this._root = node;
-}
-
-
-function findIndex(arr, x, y) {
-	var index;
-
-	for (var i = 0; i < arr.length; i++) {
-		if (arr[i].data.x === px && arr[i].data.y === py) {
-			index = i;
-		}
+NodeMaze.prototype.setData = function(wallList, p) {
+	if (this.data) {
+		this.walls = wallList;
+		this.data.pDir = p;
 	}
-
-	return index;
 }
 
-function traverse(currentNode, callback) {
-	for (var i = 0; i < currentNode.children.length; i++) {
-		traverse(currentNode.children[i], callback);
+NodeMaze.prototype.findHead = function() {
+	if (this.parent === null) {
+		return this;
 	}
-	callback(currentNode);
+	return this.parent.findHead();
 }
 
-TreeMaze.prototype.traverseDF = function(callback) {
-	traverse(this._root, callback);
-};
-
-TreeMaze.prototype.add = function(x, y, wallList, px, py) {
-	var child = new NodeMaze(x, y, wallList[0], wallList[1], wallList[2], wallList[3], wallList[4], wallList[5], wallList[6], wallList[7]);
-	var parent = null;
-
-	traverse(this._root, function (node) {
-		if (node.data.x === px && node.data.y === py) {
-			parent = node;
+traverse = function(currentNode, callback) {
+	if (currentNode.children) {
+		for (var i = 0; i < currentNode.children.length; i++) {
+			traverse(currentNode.children[i], callback);
 		}
-	});
+		callback(currentNode);
+	}
+}
 
-	if (parent) {
-		parent.children.push(child);
-		child.parent = parent;
+NodeMaze.prototype.traverseDF = function(callback) {
+	traverse(this.findHead(), callback);
+}
+
+NodeMaze.prototype.add = function (x, y, wallList, p, node) {
+	var child;
+	if (node) {
+		child = new NodeMaze(x, y, wallList, p);
+		node.children.push(child);
 	} else {
-		console.log('Cannot add node to a non-existent parent.  (x, y)--> ('+px+", "+py+")");
+		console.log("Cannot add node to a non-existent parent");
 	}
-};
+}
 
-TreeMaze.prototype.remove = function(x, y, px, py, traversal) {
+/*TreeMaze.prototype.remove = function(x, y, px, py, traversal) {
 	var tree = this,
 	parent = null,
 	childToRemove = null,
@@ -78,5 +70,5 @@ TreeMaze.prototype.remove = function(x, y, px, py, traversal) {
 	}
 
 	return childToRemove;
-};
+};*/
 

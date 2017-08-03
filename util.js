@@ -4,21 +4,37 @@ randomInt = function(min, max) {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-calcHValue = function(toSpot) {
+calcHValue = function(toSpot, wid, hig, hval) {
 	var temp = 0;
-	for (var i = 0; i < theGrid.length; i++) {
-		temp+=Math.abs(((toSpot%gridWidth)-(i%gridWidth)));
-		temp+=Math.abs(parseInt(toSpot/gridWidth)-parseInt(i/gridWidth));
-
-		HValueArr.push(temp);
-		temp = 0;
+	for (var i = 0; i < wid; i++) {
+		for (var j = 0; j < hig; j++) {
+			temp+=Math.abs((toSpot%wid)-i);
+			temp+=Math.abs(Math.floor(toSpot/wWid)-j);
+			hval.push(temp);
+			temp = 0;
+		}
 	}
+	return hval;
 }
 
-updateGrid = function (wid, grid) {
-	for (var i = 0; i < (wid*wid); i++) {
-		if (i % wid === 0 || i % wid === wid-1 || i < wid || i > (wid*wid)-1-wid) {
-			grid[i] = false;
+updateGrid = function (wid, hig, grid) {
+	var c = 0;
+	for (var i = 0; i < wid; i++) {
+		for (var j = 0; j < hig; j++) {
+			grid[c].setData([true, true, true, true, true, true, true, true], -1);
+			if (i === 0) {
+				grid[c].walls[6] = false;
+				if (j === 0) grid[c].walls[7] = false;
+				if (j === hig-1) grid[c].walls[5] = false;
+			}
+			else if (i === wid-1) {
+				grid[c].walls[2] = false;
+				if (j === 0) grid[c].walls[1] = false;
+				if (j === hig-1) grid[c].walls[3] = false;
+			}
+			if (j === 0) grid[c].walls[0] = false;
+			else if (j === hig-1) grid[c].walls[4] = false;
+			c++;
 		}
 	}
 	return grid;

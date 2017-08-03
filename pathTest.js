@@ -14,9 +14,9 @@ var pathing = false;
 var to = 100;
 var startL;
 var useJump = false;
-var worldSize = 400;
-var roomSize = 40;
-var gridWidth = worldSize/roomSize;
+var wWid = 20;
+var wHig = 20;
+var roomSize = 20;
 
 var animateMaze = false;
 var startMaze = false;
@@ -30,25 +30,35 @@ var maze;
 var move = [10, 14, 10, 14, 10, 14, 10, 14];
 
 function setup() {
-	var myCanvas = createCanvas(worldSize+10, worldSize+100);
+	var myCanvas = createCanvas(wWid*roomSize+10, wHig*roomSize+100);
 	myCanvas.parent('drawHere');
 
-	for (var i = 0; i < (gridWidth*gridWidth); i++) {
-		theGrid.push(true);
-	}
-
-	theGrid = updateGrid(gridWidth, theGrid);
-	for (var i = 0; i < (gridWidth*gridWidth); i++) {
-		if (theGrid[i] === false) {
-			fill(0);
-			rect((i % gridWidth) * roomSize, (int)(i / gridWidth) * roomSize, roomSize, roomSize);
-		}
-	}
-	
 	textSize(8);
 	textAlign(CENTER);
 	rectMode(CORNER);
 	ellipseMode(CORNER);
+
+	for (var i = 0; i < wWid; i++) {
+		for (var j = 0; j < wHig; j++) {
+			theGrid.push(new NodeMaze(i, j, [true, true, true, true, true, true, true, true], -1));
+		}
+	}
+
+	theGrid = updateGrid(wWid, wHig, theGrid);
+	fill(0);
+	stroke(0);
+	var c = 0;
+	for (var i = 0; i < wWid; i++) {
+		for (var j = 0; j < wHig; j++) {
+			if (!theGrid[c].walls[0]) line(i * roomSize, j * roomSize, i * roomSize + roomSize, j * roomSize);
+			if (!theGrid[c].walls[2]) line(i * roomSize + roomSize, j * roomSize, i * roomSize + roomSize, j * roomSize + roomSize);
+			if (!theGrid[c].walls[4]) line(i * roomSize, j * roomSize + roomSize, i * roomSize + roomSize, j * roomSize + roomSize);
+			if (!theGrid[c].walls[6]) line(i * roomSize, j * roomSize, i * roomSize, j * roomSize + roomSize);
+			c++;
+		}
+	}
+	
+	
 }
 
 
@@ -80,23 +90,17 @@ function keyTyped () {
 	else if (key === 'p') {
 		//console.log("pppp");
 		background(255);
-		theGrid = updateGrid(gridWidth, theGrid);
-		for (var i = 0; i < (gridWidth*gridWidth); i++) {
-			if (theGrid[i] === false) {
-				stroke(0);
-				strokeWeight(1);
-				if (i < (gridWidth*gridWidth) - 1 && theGrid[i+1])
-					line((i % gridWidth) * roomSize, (int)(i / gridWidth) * roomSize, 
-						(i % gridWidth) * roomSize, (int)(i / gridWidth) * roomSize + roomSize);
-				if (i > 0 && theGrid[i-1])
-					line((i % gridWidth) * roomSize, (int)(i / gridWidth) * roomSize, 
-						(i % gridWidth) * roomSize, (int)(i / gridWidth) * roomSize + roomSize);
-				if (i < (gridWidth*gridWidth) - gridWidth && theGrid[i+gridWidth])
-					line((i % gridWidth) * roomSize, (int)(i / gridWidth) * roomSize + roomSize, 
-						(i % gridWidth) * roomSize + roomSize, (int)(i / gridWidth) * roomSize + roomSize);
-				if (i > gridWidth && theGrid[i-gridWidth])
-					line((i % gridWidth) * roomSize, (int)(i / gridWidth) * roomSize + roomSize, 
-						(i % gridWidth) * roomSize + roomSize, (int)(i / gridWidth) * roomSize + roomSize);
+		theGrid = updateGrid(wWid, wHig, theGrid);
+		fill(0);
+		stroke(0);
+		var c = 0;
+		for (var i = 0; i < wWid; i++) {
+			for (var j = 0; j < wHig; j++) {
+				if (!theGrid[c].data.u) line(i * roomSize, j * roomSize, i * roomSize + roomSize, j * roomSize);
+				if (!theGrid[c].data.r) line(i * roomSize + roomSize, j * roomSize, i * roomSize + roomSize, j * roomSize + roomSize);
+				if (!theGrid[c].data.d) line(i * roomSize, j * roomSize + roomSize, i * roomSize + roomSize, j * roomSize + roomSize);
+				if (!theGrid[c].data.l) line(i * roomSize, j * roomSize, i * roomSize, j * roomSize + roomSize);
+				c++;
 			}
 		}
 		makePath = true;
@@ -120,23 +124,24 @@ function keyTyped () {
 	else if (key === 'm') {
 		if (!animateMaze) {
 			background(255);
-			var mazeTree = new TreeMaze(0, 0, false, true, true, false, false, false, false, true);
-			mazeTree = makeMaze(0, 0, gridWidth, gridWidth, mazeTree);
+			var wallList = [true, true, true, true, true, true, true, true];
+			var mazeTree = makeMaze(0, 0, wWid, wHig, new NodeMaze(0, 0, wallList, 6), 6);
 			mazeTree.traverseDF(function (node) {
+
 				
 				stroke(0);
 				strokeWeight(1);
-				if (!node.data.u && !node.data.ut) line(node.data.x * roomSize, node.data.y * roomSize, node.data.x * roomSize + roomSize, node.data.y * roomSize);
+				if (!node.walls[0] && node.data.pDir !== 0) line(node.data.x * roomSize, node.data.y * roomSize, node.data.x * roomSize + roomSize, node.data.y * roomSize);
 
-				if (!node.data.r && !node.data.rt) line(node.data.x * roomSize + roomSize, node.data.y * roomSize, node.data.x * roomSize + roomSize, node.data.y * roomSize + roomSize);
+				if (!node.walls[2] && node.data.pDir !== 2) line(node.data.x * roomSize + roomSize, node.data.y * roomSize, node.data.x * roomSize + roomSize, node.data.y * roomSize + roomSize);
 
-				if (!node.data.d && !node.data.dt) line(node.data.x * roomSize, node.data.y * roomSize + roomSize, node.data.x * roomSize + roomSize, node.data.y * roomSize + roomSize);
+				if (!node.walls[4] && node.data.pDir !== 4) line(node.data.x * roomSize, node.data.y * roomSize + roomSize, node.data.x * roomSize + roomSize, node.data.y * roomSize + roomSize);
 
-				if (!node.data.l && !node.data.lt) line(node.data.x * roomSize, node.data.y * roomSize, node.data.x * roomSize, node.data.y * roomSize + roomSize);
+				if (!node.walls[6] && node.data.pDir !== 6) line(node.data.x * roomSize, node.data.y * roomSize, node.data.x * roomSize, node.data.y * roomSize + roomSize);
 
 
 
-				stroke(255, 0, 0);
+				/*stroke(255, 0, 0);
 				if (node.parent != null)
 					line(node.data.x * roomSize + roomSize/2, node.data.y * roomSize + roomSize/2, 
 						node.parent.data.x * roomSize + roomSize/2, node.parent.data.y * roomSize + roomSize/2);
@@ -149,23 +154,23 @@ function keyTyped () {
 
 				stroke(255, 0, 0);
 
-				if (node.data.ut) rect(node.data.x * roomSize + roomSize/2 - roomSize/10, node.data.y * roomSize, roomSize/7, roomSize/7);
-				if (node.data.rt) rect(node.data.x * roomSize + roomSize - roomSize/5, node.data.y * roomSize + roomSize/2 - roomSize/10, roomSize/7, roomSize/7);
-				if (node.data.dt) rect(node.data.x * roomSize + roomSize/2 - roomSize/10, node.data.y * roomSize + roomSize - roomSize/5, roomSize/7, roomSize/7);
-				if (node.data.lt) rect(node.data.x * roomSize, node.data.y * roomSize + roomSize/2 - roomSize/10, roomSize/7, roomSize/7);
-
+				if (node.data.pDir === 0) rect(node.data.x * roomSize + roomSize/2 - roomSize/10, node.data.y * roomSize, roomSize/7, roomSize/7);
+				if (node.data.pDir === 1) rect(node.data.x * roomSize + roomSize - roomSize/5, node.data.y * roomSize + roomSize/2 - roomSize/10, roomSize/7, roomSize/7);
+				if (node.data.pDir === 2) rect(node.data.x * roomSize + roomSize/2 - roomSize/10, node.data.y * roomSize + roomSize - roomSize/5, roomSize/7, roomSize/7);
+				if (node.data.pDir === 3) rect(node.data.x * roomSize, node.data.y * roomSize + roomSize/2 - roomSize/10, roomSize/7, roomSize/7);
+				*/
 			});
-} else {
-	background(255);
-	maze = new TreeMaze(0, 0, false, true, true, false, false, false, false, true);
-	x = 0;
-	y = 0;
-	wid = gridWidth;
-	hig = gridWidth;
-	startMaze = true;
-}
+		} else {
+			background(255);
+			maze = new TreeMaze(0, 0, false, true, true, false, false, false, false, true);
+			x = 0;
+			y = 0;
+			wid = gridWidth;
+			hig = gridWidth;
+			startMaze = true;
+		}
 
-}
+	}
 }
 
 
@@ -178,6 +183,85 @@ function draw() {
 
 	//console.log(useJump);
 
+	
+if (makePath) {
+	to = wWid*wHig-1;
+	HValueArr = calcHValue(to);
+	strokeWeight(.1);
+	for (var i = 0; i < HValueArr.length; i++) {
+		text(HValueArr[i], (i % gridWidth) * roomSize + roomSize/2, (int)(i / gridWidth) * roomSize + roomSize*.75);
+	}
+	strokeWeight(1);
+
+	arrForParents = [];
+
+
+
+
+	if (useJump) {
+		var jumpList = new Tree(HValueArr[0], 0, 0, 8, false);
+			//var closed = [];
+			var date1 = new Date();
+			timeA = date1.getMilliseconds();
+			pathArr = jumpPath(0, to, jumpList, wWid, wHig, theGrid);
+			var date2 = new Date();
+			timeB = date2.getMilliseconds();
+
+			timeDif = timeB - timeA;
+			strokeWeight(.1);
+			text(timeDif+" Ms", width/2, height-20);
+			strokeWeight(1);
+
+			fill(0, 255, 0);
+			jumpList.traverseDF(function(node) {
+				rect((node.data.id % gridWidth) * roomSize, (int)(node.data.id / gridWidth) * roomSize, roomSize, roomSize);
+			});
+			console.log("jumpped");
+		} 
+
+
+		else {
+			var starList = new Tree(HValueArr[0], 0, 0, 8, 'true');
+			var date1 = new Date();
+			timeA = date1.getMilliseconds();
+			pathArr = starPath(0, to, starList, wWid, wHig, theGrid);
+			var date2 = new Date();
+			timeB = date2.getMilliseconds();
+
+			timeDif = timeB - timeA;
+			strokeWeight(.1);
+			text(timeDif+" Ms", width/2, height-20);
+			strokeWeight(1);
+
+			fill(0, 255, 0);
+			starList.traverseDF(function(node) {
+				rect((node.data.id % gridWidth) * roomSize, (int)(node.data.id / gridWidth) * roomSize, roomSize, roomSize);
+			});
+			console.log("starred");
+		}
+		
+		
+
+		fill(255, 0, 0);
+		rect((position % gridWidth) * roomSize, (int)(position / gridWidth) * roomSize, roomSize, roomSize);
+		fill(255, 0, 255);
+		rect((to % gridWidth) * roomSize, (int)(to / gridWidth) * roomSize, roomSize, roomSize);
+
+		stroke(255, 0, 0);
+		strokeWeight(5);
+		for (var i = 1; i < pathArr.length; i++) {
+			line((pathArr[i-1] % gridWidth) * roomSize + roomSize/2, (int)(pathArr[i-1] / gridWidth) * roomSize + roomSize/2, (pathArr[i] % gridWidth) * roomSize + roomSize/2, (int)(pathArr[i] / gridWidth) * roomSize + roomSize/2);
+		}
+		stroke(0);
+		strokeWeight(1);
+		makePath = false;
+		timeDif = 0;
+	}
+
+
+	count++;
+
+/*
 	if (animateMaze && startMaze) {
 		var neighborsM = [true, true, true, true, false, false, false, false];
 		var randSpotM;
@@ -289,83 +373,7 @@ function draw() {
 
 		for (var h = 0; h < 10000; h++){for (var r = 0; r < 100000; r++){}}
 	}
-
-	if (makePath) {
-		HValueArr = [];
-		calcHValue(to, 0);
-		strokeWeight(.1);
-		for (var i = 0; i < HValueArr.length; i++) {
-			text(HValueArr[i], (i % gridWidth) * roomSize + roomSize/2, (int)(i / gridWidth) * roomSize + roomSize*.75);
-		}
-		strokeWeight(1);
-
-		arrForParents = [];
-
-
-
-
-		if (useJump) {
-			var jumpList = new Tree(HValueArr[position], 0, position, 8, 'false');
-			//var closed = [];
-			var date1 = new Date();
-			timeA = date1.getMilliseconds();
-			pathArr = jumpPath(position, to, jumpList, gridWidth, theGrid);
-			var date2 = new Date();
-			timeB = date2.getMilliseconds();
-
-			timeDif = timeB - timeA;
-			strokeWeight(.1);
-			text(timeDif+" Ms", width/2, height-20);
-			strokeWeight(1);
-
-			fill(0, 255, 0);
-			jumpList.traverseDF(function(node) {
-				rect((node.data.id % gridWidth) * roomSize, (int)(node.data.id / gridWidth) * roomSize, roomSize, roomSize);
-			});
-			console.log("jumpped");
-		} 
-
-
-		else {
-			var starList = new Tree(HValueArr[position], 0, position, 8, 'true');
-			var date1 = new Date();
-			timeA = date1.getMilliseconds();
-			pathArr = starPath(position, to, starList, gridWidth, theGrid);
-			var date2 = new Date();
-			timeB = date2.getMilliseconds();
-
-			timeDif = timeB - timeA;
-			strokeWeight(.1);
-			text(timeDif+" Ms", width/2, height-20);
-			strokeWeight(1);
-
-			fill(0, 255, 0);
-			starList.traverseDF(function(node) {
-				rect((node.data.id % gridWidth) * roomSize, (int)(node.data.id / gridWidth) * roomSize, roomSize, roomSize);
-			});
-			console.log("starred");
-		}
-		
-		
-
-		fill(255, 0, 0);
-		rect((position % gridWidth) * roomSize, (int)(position / gridWidth) * roomSize, roomSize, roomSize);
-		fill(255, 0, 255);
-		rect((to % gridWidth) * roomSize, (int)(to / gridWidth) * roomSize, roomSize, roomSize);
-
-		stroke(255, 0, 0);
-		strokeWeight(5);
-		for (var i = 1; i < pathArr.length; i++) {
-			line((pathArr[i-1] % gridWidth) * roomSize + roomSize/2, (int)(pathArr[i-1] / gridWidth) * roomSize + roomSize/2, (pathArr[i] % gridWidth) * roomSize + roomSize/2, (int)(pathArr[i] / gridWidth) * roomSize + roomSize/2);
-		}
-		stroke(0);
-		strokeWeight(1);
-		makePath = false;
-		timeDif = 0;
-	}
-
-
-	count++;
+*/
 }
 
 
