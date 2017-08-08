@@ -1,91 +1,61 @@
-starPath = function (start, target, openS, wid, hig, grid) {
-	var spots = [start-wid, start-wid+1, start+1, start+wid+1, start+wid, start+wid-1, start-1, start-wid-1];
-	var parentMove = 0;
-	var temp  = null;
-	var dirNext;
+starPath = function (currentNode, wid, grid, hVal) {
 	var lowest = 50000000000000;
-	var lowestID = -1;
-	var nextID = -1;
-	var quit = false;
+	var nextNode = null;
 
-	openS.contains(function(node) {
-		if (node.data.id === start) {
-			parentMove = node.data.G;
-		} 
-	}, openS.traverseDF);
+	//console.log(currentNode);
 
-	lookAroundS(start, parentMove, openS, wid, hig, grid);
+	lookAroundS(currentNode.data.G, currentNode, wid, grid, hVal);
 
-	openS.traverseDF(function(node) {
-		if (node.data.F < lowest && node.data.check === 'false') {
+	currentNode.traverseDF(function(node) {
+		if (node.data.F < lowest && !node.data.check) {
 			lowest = node.data.F;
-			lowestID = node.data.id;
-			dirNext = node.data.dir;
+			nextNode = node;
 		}
 	});
 
-	openS.traverseDF(function(node) {
-		if (node.data.id === lowestID) {
-			if (node.data.H === 0) {
-				quit = true;
-			}
-			else {
-				node.data.check = 'true';
-			}
-		}
-	});
+	nextNode.data.check = true;
 
-	if (quit) return traceParents(openS, lowestID);
+	if (nextNode.data.H === 0) {
+		return traceParents(nextNode);
+	}
 
-
-	return starPath(lowestID, target, openS, wid, grid);
+	return starPath(nextNode, wid, grid, hVal);
 
 }
 
 
-lookAroundS = function (start, parentMove, openS, wid, hig, grid) {
+lookAroundS = function (parentMove, parent, wid, grid, hVal) {
+	var currentID = parent.data.id;
 	var cs = [true, true, true, true, true, true, true, true];
-	var inOpen = [false, false, false, false, false, false, false, false];
-	var spots = [start-wid, start-wid+1, start+1, start+wid+1, start+wid, start+wid-1, start-1, start-wid-1];
-	var parent;
+	var spots = [currentID-wid, currentID-wid+1, currentID+1, currentID+wid+1, currentID+wid, currentID+wid-1, currentID-1, currentID-wid-1];
 
-	for (var i = 0; i < 8; i++) {
-		if (grid[spots[i]] === false || spots[i] < 0 || spots[i] >= (wid*wid)) {
+	for (var i = 0; i < cs.length; i+=2) {
+		if (!grid[currentID].walls[i] && grid[currentID].pDir !== i && !grid[currentID].nDir[i]) {
 			cs[i] = false;
 		}
 	}
 
+	//console.log(currentID);
+	//console.log(grid[currentID].walls);
+	//console.log(cs);
 
-	openS.contains(function(node) {
-		if (node.data.id === start) {
-			parent = node;
-		}
-	}, openS.traverseDF);
 
-	openS.traverseDF(function(node) {
-		for (var i = 0; i < 8; i++) {
+	parent.traverseDF(function(node) {
+		for (var i = 0; i < cs.length; i+=2) {
 			if (node.data.id === spots[i]) {
-				inOpen[i] = true;
+				if (node.data.G > move[i]+parentMove) {
+					node.data.G = move[i]+parentMove;
+					node.parent = parent;
+				}
+				cs[i] = false;
 			}
 		}
 	});
 
-	for (var i = 0; i < 8; i++) {
+	for (var i = 0; i < cs.length; i+=2) {
 		if (cs[i]) {
-			if (inOpen[i]) {
-				openS.contains(function(node) {
-					if (node.data.id === spots[i]) {
-						if (node.data.G > move[i]+parentMove) {
-							node.data.G = move[i]+parentMove;
-							node.parent = parent;
-						}
-					}
-				}, openS.traverseDF);
-				cs[i] = false;
-			}
-			else {
-				openS.add(HValueArr[spots[i]], move[i]+parentMove, spots[i], i, 'false', start, openS.traverseDF);
-			}
+			parent.add(hVal[spots[i]], move[i]+parentMove, spots[i], false, currentID);
 		}
 	}
+	
 }

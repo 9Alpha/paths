@@ -1,13 +1,13 @@
 function NodeMaze(x, y, wallList, p) {
 	this.data = {"x": x, "y": y, "pDir": p};
 	this.walls = wallList;
-	this.data.pDir = p;
+	this.nDir = [false, false, false, false, false, false, false, false];
 	this.parent = null;
 	this.children = [];
 }
 
 NodeMaze.prototype.setData = function(wallList, p) {
-	if (this.data) {
+	if (this) {
 		this.walls = wallList;
 		this.data.pDir = p;
 	}
@@ -33,42 +33,12 @@ NodeMaze.prototype.traverseDF = function(callback) {
 	traverse(this.findHead(), callback);
 }
 
-NodeMaze.prototype.add = function (x, y, wallList, p, node) {
+NodeMaze.prototype.add = function (x, y, wallList, p) {
 	var child;
-	if (node) {
-		child = new NodeMaze(x, y, wallList, p);
-		node.children.push(child);
-	} else {
-		console.log("Cannot add node to a non-existent parent");
-	}
+	child = new NodeMaze(x, y, wallList, p);
+	this.children.push(child);
+	child.parent = this;
+	return child;
 }
 
-/*TreeMaze.prototype.remove = function(x, y, px, py, traversal) {
-	var tree = this,
-	parent = null,
-	childToRemove = null,
-	index;
-
-	var callback = function(node) {
-		if (node.data.x === px && node.data.y === py) {
-			parent = node;
-		}
-	};
-
-	this.contains(traversal, callback);
-
-	if (parent) {
-		index = findIndex(parent.children, x, y);
-
-		if (index === undefined) {
-			console.log('Node to remove does not exist. (x, y)--> ('+x+", "+y+")");
-		} else {
-			childToRemove = parent.children.splice(index, 1);
-		}
-	} else {
-		console.log('Parent does not exist. (x, y)--> ('+px+", "+py+")");
-	}
-
-	return childToRemove;
-};*/
 
