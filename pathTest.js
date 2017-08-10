@@ -14,9 +14,9 @@ var pathDone = false;
 var pathing = false;
 var startL;
 var useJump = false;
-var wWid = 30;
-var wHig = 40;
-var roomSize = 10;
+var wWid = 5;
+var wHig = 5;
+var roomSize = 40;
 
 var drawMazeUtil = false;
 
@@ -35,8 +35,8 @@ function setup() {
 	var myCanvas = createCanvas(wWid*roomSize+10, wHig*roomSize+100);
 	myCanvas.parent('drawHere');
 
-	startingSquare = 0;
-	endingSquare = wWid * wHig - 1;
+	startingSquare = Math.floor(wWid/2);
+	endingSquare = Math.floor(wWid * wHig - wWid/2);
 
 	textSize(8);
 	textAlign(CENTER);
@@ -96,8 +96,6 @@ function keyTyped () {
 		//console.log("pppp");
 		background(255);
 		//theGrid = updateGrid(wWid, wHig, theGrid);
-		fill(0);
-		stroke(0);
 		var c = 0;
 		for (var i = 0; i < wHig; i++) {
 			for (var j = 0; j < wWid; j++) {
@@ -105,6 +103,19 @@ function keyTyped () {
 				c++;
 			}
 		}
+		HValueArr = calcHValue(endingSquare, wWid, wHig, HValueArr);
+		fill(0);
+		strokeWeight(.1);
+		var c = 0;;
+		for (var i = 0; i < wWid; i++) {
+			for (var j = 0; j < wHig; j++) {
+				text(HValueArr[c], i * roomSize + roomSize/2, j * roomSize + roomSize*.75);
+				c++;
+			}
+		}
+		strokeWeight(1);
+
+		arrForParents = [];
 		makePath = true;
 	} 
 
@@ -127,7 +138,7 @@ function keyTyped () {
 		if (!animateMaze) {
 			background(255);
 			var wallList = [true, true, true, true, true, true, true, true];
-			var mazeTree = makeMaze(0, 0, wWid, wHig, new NodeMaze(0, 0, wallList, -1), -1);
+			var mazeTree = makeMaze(0, wHig-1, wWid, wHig, new NodeMaze(0, wHig-1, wallList, -1), -1);
 			mazeTree.traverseDF(function (node) {		
 				drawNode(node, roomSize, drawMazeUtil);
 				theGrid[node.data.y*wWid+node.data.x] = node;
@@ -158,18 +169,7 @@ function draw() {
 
 	
 	if (makePath) {
-		HValueArr = calcHValue(endingSquare, wWid, wHig, HValueArr);
-		strokeWeight(.1);
-		var c = 0;;
-		for (var i = 0; i < wWid; i++) {
-			for (var j = 0; j < wHig; j++) {
-				text(HValueArr[c], i * roomSize + roomSize/2, j * roomSize + roomSize*.75);
-				c++;
-			}
-		}
-		strokeWeight(1);
-
-		arrForParents = [];
+		
 
 
 
@@ -197,12 +197,12 @@ function draw() {
 
 
 		else {
-			var starNode = new PathNode(HValueArr[0], 0, startingSquare, true);
+			var starQueue = new pQueue(HValueArr[startingSquare], 0, startingSquare, true);
 
 			var date1 = new Date();
 			timeA = date1.getMilliseconds();
 
-			pathArr = starPath(starNode, wWid, theGrid, HValueArr);
+			pathArr = starPath(starQueue, starQueue.list[0], wWid, theGrid, HValueArr);
 
 			var date2 = new Date();
 			timeB = date2.getMilliseconds();
@@ -212,11 +212,11 @@ function draw() {
 			text(timeDif+" Ms", width/2, height-20);
 			strokeWeight(1);
 
-			noStroke();
+			/*noStroke();
 			fill(0, 255, 0, 40);
 			starNode.traverseDF(function(node) {
 				rect((node.data.id % wWid) * roomSize, (int)(node.data.id / wWid) * roomSize, roomSize, roomSize);
-			});
+			});*/
 			console.log("starred");
 		}
 		

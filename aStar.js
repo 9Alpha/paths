@@ -1,60 +1,56 @@
-starPath = function (currentNode, wid, grid, hVal) {
-	var lowest = 50000000000000;
+starPath = function (queue, currentNode, wid, grid, hVal) {
 	var nextNode = null;
 
-	//console.log(currentNode);
 
-	lookAroundS(currentNode.data.G, currentNode, wid, grid, hVal);
+	lookAroundS(queue, currentNode, wid, grid, hVal);
 
-	currentNode.traverseDF(function(node) {
-		if (node.data.F < lowest && !node.data.check) {
-			lowest = node.data.F;
-			nextNode = node;
-		}
-	});
-
+	nextNode = queue.pluck();
 	nextNode.data.check = true;
 
-	if (nextNode.data.H === 0) {
+	if (nextNode.data.hVal === 0) {
 		return traceParents(nextNode);
 	}
 
-	return starPath(nextNode, wid, grid, hVal);
+	console.log(queue.list);
+
+	return starPath(queue, nextNode, wid, grid, hVal);
 
 }
 
 
-lookAroundS = function (parentMove, parent, wid, grid, hVal) {
+lookAroundS = function (queue, parent, wid, grid, hVal) {
 	var currentID = parent.data.id;
 	var cs = [true, true, true, true, true, true, true, true];
 	var spots = [currentID-wid, currentID-wid+1, currentID+1, currentID+wid+1, currentID+wid, currentID+wid-1, currentID-1, currentID-wid-1];
-
-	for (var i = 0; i < cs.length; i+=2) {
-		if (!grid[currentID].walls[i] && grid[currentID].pDir !== i && !grid[currentID].nDir[i]) {
-			cs[i] = false;
-		}
-	}
 
 	//console.log(currentID);
 	//console.log(grid[currentID].walls);
 	//console.log(cs);
 
-
-	parent.traverseDF(function(node) {
-		for (var i = 0; i < cs.length; i+=2) {
-			if (node.data.id === spots[i]) {
-				if (node.data.G > move[i]+parentMove) {
-					node.data.G = move[i]+parentMove;
-					node.parent = parent;
+	for (var i = 0; i < queue.size; i++) {
+		for (var j = 0; j < cs.length; j+=2) {
+			if (queue.list[i].data.id === spots[j]) {
+				if (queue.list[i].data.pLength > move[j]+parent.data.pLength) {
+					queue.list[i].data.pLength = move[j]+parent.data.pLength;
+					queue.list[i].parent = parent;
 				}
-				cs[i] = false;
+				cs[j] = false;
 			}
+			
 		}
-	});
+	}
+
+	for (var j = 0; j < cs.length; j++) {
+		if (!grid[currentID].walls[j] && grid[currentID].pDir !== j && !grid[currentID].nDir[j]) {
+			cs[j] = false;
+		}
+	}
+
+	console.log(cs);
 
 	for (var i = 0; i < cs.length; i+=2) {
 		if (cs[i]) {
-			parent.add(hVal[spots[i]], move[i]+parentMove, spots[i], false, currentID);
+			queue.add(hVal[spots[i]], move[i]+parent.data.pLength, spots[i], false, parent);
 		}
 	}
 	
