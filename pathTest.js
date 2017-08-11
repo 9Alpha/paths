@@ -13,8 +13,8 @@ var pathDone = false;
 var pathing = false;
 var startL;
 var useJump = false;
-var wWid = 20;
-var wHig = 20;
+var wWid = 30;
+var wHig = 30;
 var roomSize = 20;
 
 var drawMazeUtil = false;
@@ -60,6 +60,7 @@ function setup() {
 		}
 	}
 	
+	mazeStartTest();
 	
 }
 
@@ -126,8 +127,9 @@ function keyTyped () {
 	else if (key === 'm') {
 		if (!animateMaze) {
 			background(255);
-			var wallList = [true, true, true, true, true, true, true, true];
-			var mazeTree = makeMaze(0, 0, wWid, wHig, new NodeMaze(0, 0, wallList, -1), -1);
+			var sX = Math.floor(wWid/2);
+			var sY = Math.floor(wHig/2);
+			var mazeTree = makeMaze(sX, sY, wWid, wHig, new NodeMaze(sX, sY, -1), -1);
 			mazeTree.traverseDF(function (node) {		
 				drawNode(node, roomSize, drawMazeUtil);
 				theGrid[node.data.y*wWid+node.data.x] = node;
@@ -146,7 +148,52 @@ function keyTyped () {
 	}
 }
 
+function mazeStartTest() {
+	var avgDir = new Array(wWid*wHig-1);
 
+	console.log("Starting Maze Tests");
+	
+	for (var y = 0; y < wHig; y++) {
+		for (var x = 0; x < wWid; x++) {
+			avgDir[y*wWid+x] = 0;
+			for (var i = 0; i < 50; i++) {
+				var testMaze = makeMaze(x, y, wWid, wHig, new NodeMaze(x, y, -1), -1);
+				testMaze.traverseDF(function (node) {
+					avgDir[y*wWid+x] += ((node.data.pDir+1)-4)
+				});
+			}
+
+		}
+	}
+
+	colorMode(HSB, 1);
+
+	var max = -1000000;
+	var min = 1000000;
+
+	for (var i = 0; i < avgDir.length; i++) {
+		if (avgDir[i] < min) min = avgDir[i];
+		if (avgDir[i] > max) max = avgDir[i];
+	}
+
+	for (var i = 0; i < height/4; i++) {
+		var h = map(i, 0, height/4, 1, 0);
+		stroke(h, .8, .8);
+		line(width, i, width-10, i);
+	}
+
+	stroke(0);
+
+	fill(map(0, min, max, 0, 1), .8, .8);
+	rect(width-10, height/4, 10, height*.75-100);
+	
+	for (var i = 0; i < avgDir.length; i++) {
+		var hue = map(Math.abs(avgDir[i]), min, max, 0, 1);
+		fill(hue, .8, .8);
+		rect((i % wWid) * roomSize, (int)(i / wWid) * roomSize, roomSize, roomSize);
+	}
+
+}
 
 
 

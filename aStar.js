@@ -16,11 +16,6 @@ starPath = function (currentNode, wid, grid, hVal) {
 		}
 	});
 
-	if (lowest === null) {
-		//console.log(nextNode);
-		return traceParents(currentNode);
-	}
-
 	nextNode.data.check = true;
 
 	if (nextNode.data.hVal === 0) {
@@ -36,19 +31,21 @@ lookAroundS = function (parent, wid, grid, hVal) {
 	var cs = [true, true, true, true, true, true, true, true];
 	var spots = [parent.data.id-wid, parent.data.id-wid+1, parent.data.id+1, parent.data.id+wid+1, parent.data.id+wid, parent.data.id+wid-1, parent.data.id-1, parent.data.id-wid-1];
 
+	var arrInc = 2;
+
 	//console.log(grid[parent.data.id].walls);
 	//console.log(grid[parent.data.id].data.pDir);
 	//console.log(grid[parent.data.id].nDir);
 
-	for (var i = 0; i < cs.length; i+=2) {
-		if (!grid[parent.data.id].walls[i] && grid[parent.data.id].data.pDir !== i && !grid[parent.data.id].nDir[i]) {
+	for (var i = 0; i < cs.length; i+=arrInc) {
+		if (grid[parent.data.id].data.pDir !== i && !grid[parent.data.id].nDir[i]) {
 			cs[i] = false;
 		}
 	}
 
 
 	parent.traverseDF(function(node) {
-		for (var i = 0; i < cs.length; i+=2) {
+		for (var i = 0; i < cs.length; i+=arrInc) {
 			if (node.data.id === spots[i] && cs[i]) {
 				if (node.data.pLength > move[i]+parent.data.pLength) {
 					node.data.pLength = move[i]+parent.data.pLength;
@@ -61,7 +58,7 @@ lookAroundS = function (parent, wid, grid, hVal) {
 
 	//console.log(cs);
 
-	for (var i = 0; i < cs.length; i+=2) {
+	for (var i = 0; i < cs.length; i+=arrInc) {
 		if (cs[i]) {
 			parent.add(hVal[spots[i]], move[i]+parent.data.pLength, spots[i], false);
 		}

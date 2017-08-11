@@ -1,14 +1,13 @@
-function NodeMaze(x, y, wallList, p) {
+function NodeMaze(x, y, p) {
 	this.data = {"x": x, "y": y, "pDir": p};
-	this.walls = wallList;
 	this.nDir = [false, false, false, false, false, false, false, false];
 	this.parent = null;
 	this.children = [];
 }
 
-NodeMaze.prototype.setData = function(wallList, p) {
+NodeMaze.prototype.setData = function(dirList, p) {
 	if (this) {
-		this.walls = wallList;
+		this.nDir = dirList;
 		this.data.pDir = p;
 	}
 }
@@ -33,9 +32,9 @@ NodeMaze.prototype.traverseDF = function(callback) {
 	traverse(this.findHead(), callback);
 }
 
-NodeMaze.prototype.add = function (x, y, wallList, p) {
+NodeMaze.prototype.add = function (x, y, p) {
 	var child;
-	child = new NodeMaze(x, y, wallList, p);
+	child = new NodeMaze(x, y, p);
 	this.children.push(child);
 	child.parent = this;
 	return child;
