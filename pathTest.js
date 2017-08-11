@@ -59,7 +59,20 @@ function setup() {
 			c++;
 		}
 	}
-	
+	/*
+	var pTest = new pQueue(1, 1, 0, false);
+	pTest.add(3, 6, 1, false, 0);
+	pTest.add(1, 2, 2, false, 0);
+	pTest.add(0, 0, 3, false, 0);
+	pTest.add(1, 5, 4, false, 0);
+	pTest.toString();
+	pTest.pluck();
+	pTest.toString();
+	pTest.pluck();
+	pTest.toString();
+	pTest.pluck();
+	pTest.toString();
+	*/
 	
 }
 
@@ -198,11 +211,13 @@ function draw() {
 
 		else {
 			var starQueue = new pQueue(HValueArr[startingSquare], 0, startingSquare, true);
-
+			var nextNode = starQueue.pluck();
+			var listOfNodes = new Array(wWid*wHig);
+			listOfNodes[startingSquare] = null;
 			var date1 = new Date();
 			timeA = date1.getMilliseconds();
 
-			pathArr = starPath(starQueue, starQueue.list[0], wWid, theGrid, HValueArr);
+			pathArr = starPath(starQueue, nextNode, wWid, theGrid, HValueArr, listOfNodes);
 
 			var date2 = new Date();
 			timeB = date2.getMilliseconds();

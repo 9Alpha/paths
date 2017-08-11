@@ -80,13 +80,13 @@ updateGrid = function (wid, hig, grid) {
 	return grid;
 }
 
-traceParents = function (node) {
+traceParents = function (list, id) {
 	var arrForParents = [];
-	while (node.parent) {
-		arrForParents.push(node.data.id);
-		node = node.parent;
+	while (list[id]) {
+		arrForParents.push(id);
+		id = list[id];
 	}
-	arrForParents.push(node.data.id);
+	arrForParents.push(id);
 	return arrForParents.reverse();
 }
 

@@ -1,24 +1,31 @@
-starPath = function (queue, currentNode, wid, grid, hVal) {
+starPath = function (queue, currentNode, wid, grid, hVal, nodeList) {
 	var nextNode = null;
 
+	//console.log(currentNode);
 
-	lookAroundS(queue, currentNode, wid, grid, hVal);
+	lookAroundS(queue, currentNode, wid, grid, hVal, nodeList);
 
-	nextNode = queue.pluck();
+	queue.toString();
+
+	nextNode = queue.list[0];
 	nextNode.data.check = true;
 
-	if (nextNode.data.hVal === 0) {
-		return traceParents(nextNode);
+	if (nextNode === currentNode) {
+		queue.pluck();
 	}
 
-	console.log(queue.list);
+	if (nextNode.data.hVal === 0) {
+		return traceParents(nodeList, nextNode.data.id);
+	}
 
-	return starPath(queue, nextNode, wid, grid, hVal);
+	//console.log(queue.list);
 
+
+	return starPath(queue, nextNode, wid, grid, hVal, nodeList);
 }
 
 
-lookAroundS = function (queue, parent, wid, grid, hVal) {
+lookAroundS = function (queue, parent, wid, grid, hVal, nodeList) {
 	var currentID = parent.data.id;
 	var cs = [true, true, true, true, true, true, true, true];
 	var spots = [currentID-wid, currentID-wid+1, currentID+1, currentID+wid+1, currentID+wid, currentID+wid-1, currentID-1, currentID-wid-1];
@@ -46,11 +53,13 @@ lookAroundS = function (queue, parent, wid, grid, hVal) {
 		}
 	}
 
-	console.log(cs);
+	//console.log(cs);
 
 	for (var i = 0; i < cs.length; i+=2) {
 		if (cs[i]) {
+			console.log(spots[i]);
 			queue.add(hVal[spots[i]], move[i]+parent.data.pLength, spots[i], false, parent);
+			nodeList[spots[i]] = parent.data.id;
 		}
 	}
 	
