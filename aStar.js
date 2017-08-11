@@ -2,20 +2,20 @@ starPath = function (currentNode, wid, grid, hVal) {
 	var lowest = 50000000000000;
 	var nextNode = null;
 
-	//console.log(currentNode);
+	console.log(currentNode.data.id+" "+currentNode.data.hVal);
 
-	lookAroundS(currentNode.data.G, currentNode, wid, grid, hVal);
+	lookAroundS(currentNode, wid, grid, hVal);
 
 	currentNode.traverseDF(function(node) {
-		if (node.data.F < lowest && !node.data.check) {
-			lowest = node.data.F;
+		if (node.data.pWeight < lowest && !node.data.check) {
+			lowest = node.data.pWeight;
 			nextNode = node;
 		}
 	});
 
 	nextNode.data.check = true;
 
-	if (nextNode.data.H === 0) {
+	if (nextNode.data.hVal === 0) {
 		return traceParents(nextNode);
 	}
 
@@ -24,7 +24,7 @@ starPath = function (currentNode, wid, grid, hVal) {
 }
 
 
-lookAroundS = function (parentMove, parent, wid, grid, hVal) {
+lookAroundS = function (parent, wid, grid, hVal) {
 	var currentID = parent.data.id;
 	var cs = [true, true, true, true, true, true, true, true];
 	var spots = [currentID-wid, currentID-wid+1, currentID+1, currentID+wid+1, currentID+wid, currentID+wid-1, currentID-1, currentID-wid-1];
@@ -43,8 +43,8 @@ lookAroundS = function (parentMove, parent, wid, grid, hVal) {
 	parent.traverseDF(function(node) {
 		for (var i = 0; i < cs.length; i+=2) {
 			if (node.data.id === spots[i]) {
-				if (node.data.G > move[i]+parentMove) {
-					node.data.G = move[i]+parentMove;
+				if (node.data.pLength > move[i]+perent.data.pLength) {
+					node.data.pLength = move[i]+perent.data.pLength;
 					node.parent = parent;
 				}
 				cs[i] = false;

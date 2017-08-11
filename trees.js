@@ -1,6 +1,6 @@
-function PathNode(A, B, id, check) {
-	var C = (int)(B+10*A);
-	this.data = {"id": id, "H": A, "G": B, "F": C, "check": check};
+function PathNode(H, G, id, check) {
+	var F = (int)(B+10*A);
+	this.data = {"id": id, "hVal": H, "pLength": G, "pWeight": F, "check": check};
 	this.parent = null;
 	this.children = [];
 }
@@ -25,9 +25,9 @@ PathNode.prototype.traverseDF = function(callback) {
 	traverse(this.findHead(), callback);
 }
 
-PathNode.prototype.add = function (A, B, id, check, toData) {
+PathNode.prototype.add = function (H, G, id, check, toData) {
 	var child;
-	child = new PathNode(A, B, id, check);
+	child = new PathNode(H, G, id, check);
 	this.children.push(child);
 	child.parent = this;
 	return child;

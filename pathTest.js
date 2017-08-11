@@ -14,9 +14,9 @@ var pathDone = false;
 var pathing = false;
 var startL;
 var useJump = false;
-var wWid = 30;
-var wHig = 40;
-var roomSize = 10;
+var wWid = 6;
+var wHig = 7;
+var roomSize = 40;
 
 var drawMazeUtil = false;
 
