@@ -25,26 +25,25 @@ starPath = function (currentNode, wid, grid, hVal) {
 
 
 lookAroundS = function (parent, wid, grid, hVal) {
-	var currentID = parent.data.id;
 	var cs = [true, true, true, true, true, true, true, true];
-	var spots = [currentID-wid, currentID-wid+1, currentID+1, currentID+wid+1, currentID+wid, currentID+wid-1, currentID-1, currentID-wid-1];
+	var spots = [parent.data.id-wid, parent.data.id-wid+1, parent.data.id+1, parent.data.id+wid+1, parent.data.id+wid, parent.data.id+wid-1, parent.data.id-1, parent.data.id-wid-1];
 
 	for (var i = 0; i < cs.length; i+=2) {
-		if (!grid[currentID].walls[i] && grid[currentID].pDir !== i && !grid[currentID].nDir[i]) {
+		if (!grid[parent.data.id].walls[i] && grid[parent.data.id].pDir !== i && !grid[parent.data.id].nDir[i]) {
 			cs[i] = false;
 		}
 	}
 
-	//console.log(currentID);
-	//console.log(grid[currentID].walls);
+	//console.log(parent.data.id);
+	//console.log(grid[parent.data.id].walls);
 	//console.log(cs);
 
 
 	parent.traverseDF(function(node) {
 		for (var i = 0; i < cs.length; i+=2) {
 			if (node.data.id === spots[i]) {
-				if (node.data.pLength > move[i]+perent.data.pLength) {
-					node.data.pLength = move[i]+perent.data.pLength;
+				if (node.data.pLength > move[i]+parent.data.pLength) {
+					node.data.pLength = move[i]+parent.data.pLength;
 					node.parent = parent;
 				}
 				cs[i] = false;
@@ -54,7 +53,7 @@ lookAroundS = function (parent, wid, grid, hVal) {
 
 	for (var i = 0; i < cs.length; i+=2) {
 		if (cs[i]) {
-			parent.add(hVal[spots[i]], move[i]+parentMove, spots[i], false, currentID);
+			parent.add(hVal[spots[i]], move[i]+parent.data.pLength, spots[i], false, parent.data.id);
 		}
 	}
 	

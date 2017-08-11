@@ -1,5 +1,5 @@
 function PathNode(H, G, id, check) {
-	var F = (int)(B+10*A);
+	var F = (int)(G+10*H);
 	this.data = {"id": id, "hVal": H, "pLength": G, "pWeight": F, "check": check};
 	this.parent = null;
 	this.children = [];

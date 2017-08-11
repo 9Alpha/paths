@@ -1,6 +1,5 @@
 var drawHere = document.getElementById('drawHere');
 var timeA, timeB, timeDif;
-var HValueArr = [];
 var lastNode = 0;
 var count = 0;
 var ID = 0;
@@ -158,12 +157,12 @@ function draw() {
 
 	
 	if (makePath) {
-		HValueArr = calcHValue(endingSquare, wWid, wHig, HValueArr);
+		var HValueArr = calcHValue(endingSquare, wWid, wHig);
 		strokeWeight(.1);
 		var c = 0;;
-		for (var i = 0; i < wWid; i++) {
-			for (var j = 0; j < wHig; j++) {
-				text(HValueArr[c], i * roomSize + roomSize/2, j * roomSize + roomSize*.75);
+		for (var i = 0; i < wHig; i++) {
+			for (var j = 0; j < wWid; j++) {
+				text(HValueArr[c], j * roomSize + roomSize/2, i * roomSize + roomSize*.75);
 				c++;
 			}
 		}

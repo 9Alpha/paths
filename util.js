@@ -42,17 +42,18 @@ randomInt = function(min, max) {
 	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-calcHValue = function(toSpot, wid, hig, hval) {
+calcHValue = function(toSpot, wid, hig) {
+	var hValArray = [];
 	var temp = 0;
-	for (var i = 0; i < wid; i++) {
-		for (var j = 0; j < hig; j++) {
-			temp+=Math.abs((toSpot%wid)-i);
-			temp+=Math.abs(Math.floor(toSpot/wWid)-j);
-			hval.push(temp);
+	for (var i = 0; i < hig; i++) {
+		for (var j = 0; j < wid; j++) {
+			temp+=Math.abs((toSpot%wid)-j);
+			temp+=Math.abs(Math.floor(toSpot/wWid)-i);
+			hValArray.push(temp);
 			temp = 0;
 		}
 	}
-	return hval;
+	return hValArray;
 }
 
 updateGrid = function (wid, hig, grid) {
