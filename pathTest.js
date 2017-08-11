@@ -13,11 +13,12 @@ var pathDone = false;
 var pathing = false;
 var startL;
 var useJump = false;
-var wWid = 6;
-var wHig = 7;
-var roomSize = 40;
+var wWid = 20;
+var wHig = 20;
+var roomSize = 20;
 
 var drawMazeUtil = false;
+var drawHVals = false;
 
 var animateMaze = false;
 var startMaze = false;
@@ -34,8 +35,8 @@ function setup() {
 	var myCanvas = createCanvas(wWid*roomSize+10, wHig*roomSize+100);
 	myCanvas.parent('drawHere');
 
-	startingSquare = 0;
-	endingSquare = wWid * wHig - 1;
+	startingSquare = Math.floor(wWid/2);
+	endingSquare = Math.floor(wWid*wHig-wWid/2-1);
 
 	textSize(8);
 	textAlign(CENTER);
@@ -158,15 +159,18 @@ function draw() {
 	
 	if (makePath) {
 		var HValueArr = calcHValue(endingSquare, wWid, wHig);
-		strokeWeight(.1);
-		var c = 0;;
-		for (var i = 0; i < wHig; i++) {
-			for (var j = 0; j < wWid; j++) {
-				text(HValueArr[c], j * roomSize + roomSize/2, i * roomSize + roomSize*.75);
-				c++;
+
+		if (drawHVals) {
+			strokeWeight(.1);
+			var c = 0;;
+			for (var i = 0; i < wHig; i++) {
+				for (var j = 0; j < wWid; j++) {
+					text(HValueArr[c], j * roomSize + roomSize/2, i * roomSize + roomSize*.75);
+					c++;
+				}
 			}
+			strokeWeight(1);
 		}
-		strokeWeight(1);
 
 		arrForParents = [];
 
@@ -196,7 +200,7 @@ function draw() {
 
 
 		else {
-			var starNode = new PathNode(HValueArr[0], 0, startingSquare, true);
+			var starNode = new PathNode(HValueArr[startingSquare], 0, startingSquare, true);
 
 			var date1 = new Date();
 			timeA = date1.getMilliseconds();

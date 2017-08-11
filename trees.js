@@ -25,7 +25,7 @@ PathNode.prototype.traverseDF = function(callback) {
 	traverse(this.findHead(), callback);
 }
 
-PathNode.prototype.add = function (H, G, id, check, toData) {
+PathNode.prototype.add = function (H, G, id, check) {
 	var child;
 	child = new PathNode(H, G, id, check);
 	this.children.push(child);
